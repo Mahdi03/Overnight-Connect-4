@@ -37,6 +37,67 @@
                 }
                 connect4Board.appendChild(tr);
             }
+            
+
+            function checkConnect4() {
+                function find4InARowArray(array) {
+                    return array.some((a, i, aa) => {
+                        return i > 1 && a === aa[i - 3] && a === aa[i - 2] && a === aa[i - 1];
+                    });
+                }
+                fourInARow = false;
+                //Vertical test
+                for (var i = 0; i < arrOfCols.length; i++) {
+                    var column = [...arrOfCols[i]]; //Copy the values so we don't accidentally modify the OG
+                    //While empty spaces, remove those from consideration
+                    while (column[0] === "x") {
+                        column.shift(); //Remove the first element of the array
+                    }
+                    console.log(column);
+                    if (find4InARowArray(column)) {
+                        return true; //Stop looping and return the function rn rn
+                    }
+                    /*
+                    for (var j = 0; j < column.length; j++) {
+                        
+                    }
+                    */
+                }
+                //Horizontal test
+                //Let's inverse the table rn and flip it
+                function transposeMatrixArray(arr) {
+                    var transposeMatrixOfArrays = [];
+                    for (var j = 0; j < arr[0].length; j++) {
+                        transposeMatrixOfArrays.push([]); //Add the number of rows as cols    
+                    }
+                    for (var i = 0; i < arr.length; i++) {
+                        for (var j = 0; j < arr[i].length; j++) {
+                            transposeMatrixOfArrays[j].push(arr[i][j]);
+                        }
+                    }
+                    transposeMatrixOfArrays = [...transposeMatrixOfArrays];
+                    return transposeMatrixOfArrays;
+                }
+                var transposeArrOfCols = transposeMatrixArray(arrOfCols);
+                for (var i = 0; i < transposeArrOfCols.length; i++) {
+                    var column = [...transposeArrOfCols[i]]; //Copy the values so we don't accidentally modify the OG
+                    //While empty spaces, remove those from consideration (trimming only from the sides)
+                    while (column[0] === "x") {
+                        column.shift(); //Remove the first element of the array
+                    }
+                    while (column[column.length - 1] === "x") {
+                        column.pop(); //Remove all last elements if empty
+                    }
+                    console.log(column);
+                    if (find4InARowArray(column)) {
+                        return true; //Stop looping and return the function rn rn
+                    }
+                }
+                //Diagonal test
+                /*UM how tf*/
+                return fourInARow;
+            }
+
             //Make GUI
             /*
             Yellow vs. Red
@@ -49,7 +110,69 @@
             on click row, drop piece and change turn
             */
             //Make Backend
-            /**/
+            /*
+            [
+                x | x | x | x | x | x | x 
+                x | x | x | x | x | x | x 
+                x | x | x | x | x | x | x 
+                x | x | x | x | x | x | x 
+                x | x | x | x | x | x | x 
+                x | x | x | x | x | x | x 
+            ]
+            */
+           var arrOfCols = [];
+           for (var i = 0; i < 7; i++) {
+               var column = [];
+               for (var j = 0; j < 6; j++) {
+                   column.push("x");
+               }
+               arrOfCols.push(column);
+           }
+            var currentTurn;
+            var turns = 0;
+            var holes = document.querySelectorAll(".hole");
+            holes.forEach((hole) => {
+                hole.addEventListener("click", (event) => {
+                    if (turns % 2 === 0) {
+                        //Red go
+                        currentTurn = "red";
+                    }
+                    else {
+                        //Yellow go
+                        currentTurn = "yellow";
+                    }
+                    
+                    var columnIndex = parseInt(hole.getAttribute("holeNumber"));
+                    var column = arrOfCols[columnIndex];
+                    console.log(column);
+                    //If there is empty space at the top
+                    if (column[0] === "x") {
+                        //Find index of last "x" in array and replace with turn
+                        /*
+                        Make of copy of the column and remove the last value until
+                        it is an x, then the length of that array - 1 will be the
+                        new insertion index for the new piece
+                        */
+                        var copyOfColumn = [...column]; //Shallow copy the array instead of referencing the arr
+                        while (copyOfColumn[copyOfColumn.length - 1] !== "x") {
+                            copyOfColumn.pop();
+                        }
+                        column[copyOfColumn.length - 1] = currentTurn;
+                        if(checkConnect4()) {
+                            alert("Done");
+                        }
+                        else {
+                        turns++;
+                        console.log("Next turn");
+                        console.log(arrOfCols);
+                        }
+                    }
+                    else {
+                        alert("Bruh who taught you to play this game? Find another hole.");
+                    }
+                });
+            });
+
         </script>
     </body>
 </html>
