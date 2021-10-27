@@ -7,6 +7,22 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
+        <script>
+                            function transposeMatrixArray(arr) {
+                    var transposeMatrixOfArrays = [];
+                    for (var j = 0; j < arr[0].length; j++) {
+                        transposeMatrixOfArrays.push([]); //Add the number of rows as cols    
+                    }
+                    for (var i = 0; i < arr.length; i++) {
+                        for (var j = 0; j < arr[i].length; j++) {
+                            transposeMatrixOfArrays[j].push(arr[i][j]);
+                        }
+                    }
+                    transposeMatrixOfArrays = [...transposeMatrixOfArrays];
+                    return transposeMatrixOfArrays;
+                }
+
+        </script>
     </head>
     <body>
         <style>
@@ -25,6 +41,16 @@
         </style>
         <table id="connect4Board"></table>
         <script>
+            const NULL_CHAR = "x";
+            var arrOfCols = [];
+           for (var i = 0; i < 7; i++) {
+               var column = [];
+               for (var j = 0; j < 6; j++) {
+                   column.push(NULL_CHAR);
+               }
+               arrOfCols.push(column);
+           }
+
             //Make basic grid
             var connect4Board = document.querySelector("#connect4Board");
             for (var i = 0; i < 6; i++) {
@@ -37,7 +63,19 @@
                 }
                 connect4Board.appendChild(tr);
             }
-            
+            function updateBoardGUI() {
+                var transposeArrOfCols = transposeMatrixArray(arrOfCols);
+                var tr = connect4Board.querySelectorAll("tr");
+                for (var i = 0; i < transposeArrOfCols.length; i++) {
+                    var td = tr[i].querySelectorAll("td");
+                    for (var j = 0; j < transposeArrOfCols[i].length; j++) {
+                        if (transposeArrOfCols[i][j] != NULL_CHAR) {
+                            console.log(transposeArrOfCols[i][j])
+                            td[j].style.backgroundColor = transposeArrOfCols[i][j];
+                        }
+                    }
+                }
+            }
 
             function checkConnect4() {
                 function find4InARowArray(array) {
@@ -45,56 +83,135 @@
                         return i > 1 && a === aa[i - 3] && a === aa[i - 2] && a === aa[i - 1];
                     });
                 }
-                fourInARow = false;
+                function trimAndCheck(array) {
+                    for (var i = 0; i < array.length; i++) {
+                        var column = [...array[i]]; //Copy the values so we don't accidentally modify the OG
+                        //While empty spaces, remove those from consideration (trimming only from the sides)
+                        while (column[0] === NULL_CHAR) {
+                            column.shift(); //Remove the first element of the array
+                        }
+                        while (column[column.length - 1] === NULL_CHAR) {
+                            column.pop(); //Remove all last elements if empty
+                        }
+                        if (column.length == 4) {
+                            console.log(column);
+                        }
+                        if (find4InARowArray(column)) {
+                            return true; //Stop looping and return the function rn rn
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                }
+                var fourInARow = false;
                 //Vertical test
-                for (var i = 0; i < arrOfCols.length; i++) {
-                    var column = [...arrOfCols[i]]; //Copy the values so we don't accidentally modify the OG
-                    //While empty spaces, remove those from consideration
-                    while (column[0] === "x") {
-                        column.shift(); //Remove the first element of the array
-                    }
-                    console.log(column);
-                    if (find4InARowArray(column)) {
-                        return true; //Stop looping and return the function rn rn
-                    }
-                    /*
-                    for (var j = 0; j < column.length; j++) {
-                        
-                    }
-                    */
+                if (trimAndCheck(arrOfCols)) {
+                    return true;
                 }
                 //Horizontal test
                 //Let's inverse the table rn and flip it
-                function transposeMatrixArray(arr) {
-                    var transposeMatrixOfArrays = [];
-                    for (var j = 0; j < arr[0].length; j++) {
-                        transposeMatrixOfArrays.push([]); //Add the number of rows as cols    
-                    }
-                    for (var i = 0; i < arr.length; i++) {
-                        for (var j = 0; j < arr[i].length; j++) {
-                            transposeMatrixOfArrays[j].push(arr[i][j]);
-                        }
-                    }
-                    transposeMatrixOfArrays = [...transposeMatrixOfArrays];
-                    return transposeMatrixOfArrays;
-                }
                 var transposeArrOfCols = transposeMatrixArray(arrOfCols);
-                for (var i = 0; i < transposeArrOfCols.length; i++) {
-                    var column = [...transposeArrOfCols[i]]; //Copy the values so we don't accidentally modify the OG
-                    //While empty spaces, remove those from consideration (trimming only from the sides)
-                    while (column[0] === "x") {
-                        column.shift(); //Remove the first element of the array
-                    }
-                    while (column[column.length - 1] === "x") {
-                        column.pop(); //Remove all last elements if empty
-                    }
-                    console.log(column);
-                    if (find4InARowArray(column)) {
-                        return true; //Stop looping and return the function rn rn
-                    }
+                console.table(transposeArrOfCols);
+                if (trimAndCheck(transposeArrOfCols)) {
+                    return true;
                 }
                 //Diagonal test
                 /*UM how tf*/
+                var allDiagonalArrays = [];
+                function getAllDiagonalArrays(matrixArray) {
+                    //Let's use the horizontal table for our better use here
+                    //first get all diagonals top left to bottom right (same as bottom right to top left)
+                    /*var diagonal = [];
+                    for (var i = 0; i < matrixArray.length; i++) {
+                        var j = 0;
+                        while (matrixArray[i][j]) {
+                            diagonal.push(matrixArray[i][j]);
+                        }
+                    }*/
+                    for (var iterator = matrixArray.length; iterator > 0; iterator--) {
+                        var i = 0;
+                        i = iterator - 1;
+                        var j = 0;
+                        var diagonalArray = [];
+                        while (matrixArray[i] && matrixArray[i][j]) {
+                            //console.log(`i: ${i} j: ${j}`);
+                            diagonalArray.push(matrixArray[i][j]);
+                            i++;
+                            j++;
+                        }
+                        allDiagonalArrays.push(diagonalArray);
+                    }
+                    for (var iterator = 0; iterator < matrixArray[0].length; iterator++) {
+                        var i = 0;
+                        var j = iterator;
+                        var diagonalArray = [];
+                        while (matrixArray[i] && matrixArray[i][j]) {
+                            diagonalArray.push(matrixArray[i][j]);
+                            i++;
+                            j++;
+                        }
+                        allDiagonalArrays.push(diagonalArray);
+                    }
+                    for (var iterator = 0; iterator < matrixArray[0].length; iterator++) {
+                        var i = 0;
+                        var j = iterator;
+                        var diagonalArray = [];
+                        while (matrixArray[i] && matrixArray[i][j]) {
+                            diagonalArray.push(matrixArray[i][j]);
+                            i++;
+                            j--;
+                        }
+                        allDiagonalArrays.push(diagonalArray);
+                    }
+                    for (var iIterator = 0, jIterator = matrixArray[0].length - 1; iIterator < matrixArray.length, jIterator > 0; iIterator++, jIterator--) {
+                        var i = iIterator;
+                        var j = jIterator;
+                        var diagonalArray = [];
+                        while (matrixArray[i] && matrixArray[i][j]) {
+                            diagonalArray.push(matrixArray[i][j]);
+                            i++;
+                            j--;
+                        }
+                        allDiagonalArrays.push(diagonalArray);
+                    }
+                    /*
+                    for (var iterator = matrixArray.length; iterator > 0; iterator--) {
+                        var i = 0;
+                        i = iterator - 1;
+                        var j = 0;
+                        var diagonalArray = [];
+                        while (matrixArray[i][j]) {
+                            diagonalArray.push(matrixArray[i][j]);
+                            i++;
+                            j++;
+                        }
+                    }
+                    allDiagonalArrays.push(diagonalArray);
+                    /*
+                    [3,0]
+                    [2,0] [3,1]
+                    [1,0] [2,1] [3,2]
+                    [0,0] [1,1] [2,2]
+                    [0,1] [1,2]
+                    [0,2]
+                    */
+                }
+                getAllDiagonalArrays(transposeArrOfCols);
+                console.log(allDiagonalArrays);
+                if (trimAndCheck(allDiagonalArrays)) {
+                        console.log("hi");
+                        return true;
+                    }
+                /*
+                for (var t = 0; t < allDiagonalArrays.length; t++) {
+                    console.log(trimAndCheck(allDiagonalArrays[t]));
+                    if (trimAndCheck(allDiagonalArrays[t])) {
+                        console.log("hi");
+                        fourInARow = true;
+                        return true;
+                    }
+                }*/
                 return fourInARow;
             }
 
@@ -120,14 +237,6 @@
                 x | x | x | x | x | x | x 
             ]
             */
-           var arrOfCols = [];
-           for (var i = 0; i < 7; i++) {
-               var column = [];
-               for (var j = 0; j < 6; j++) {
-                   column.push("x");
-               }
-               arrOfCols.push(column);
-           }
             var currentTurn;
             var turns = 0;
             var holes = document.querySelectorAll(".hole");
@@ -144,27 +253,28 @@
                     
                     var columnIndex = parseInt(hole.getAttribute("holeNumber"));
                     var column = arrOfCols[columnIndex];
-                    console.log(column);
+                    
                     //If there is empty space at the top
-                    if (column[0] === "x") {
-                        //Find index of last "x" in array and replace with turn
+                    if (column[0] === NULL_CHAR) {
+                        //Find index of last NULL_CHAR in array and replace with turn
                         /*
                         Make of copy of the column and remove the last value until
                         it is an x, then the length of that array - 1 will be the
                         new insertion index for the new piece
                         */
                         var copyOfColumn = [...column]; //Shallow copy the array instead of referencing the arr
-                        while (copyOfColumn[copyOfColumn.length - 1] !== "x") {
+                        while (copyOfColumn[copyOfColumn.length - 1] !== NULL_CHAR) {
                             copyOfColumn.pop();
                         }
                         column[copyOfColumn.length - 1] = currentTurn;
+                        updateBoardGUI();
                         if(checkConnect4()) {
                             alert("Done");
                         }
                         else {
                         turns++;
-                        console.log("Next turn");
-                        console.log(arrOfCols);
+                        //console.log("Next turn");
+                        //console.log(arrOfCols);
                         }
                     }
                     else {
