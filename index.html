@@ -8,7 +8,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
         <script>
-                            function transposeMatrixArray(arr) {
+            const NULL_CHAR = "x";
+            const WIDTH = 7 + 1;
+            const HEIGHT = 6 + 1;
+
+                function transposeMatrixArray(arr) {
                     var transposeMatrixOfArrays = [];
                     for (var j = 0; j < arr[0].length; j++) {
                         transposeMatrixOfArrays.push([]); //Add the number of rows as cols    
@@ -26,26 +30,48 @@
     </head>
     <body>
         <style>
+            body {
+                background-color: pink;
+            }
+            #previewPieces {
+                border-spacing: 20px;
+                margin: 0px auto;
+            }
+            #previewPieces .previewPiece {
+                border-radius: 100%;
+                width: 55px;
+                height: 55px;
+            }
             #connect4Board {
                 background-color: blue;
-                border-spacing: 20px;
-                margin: 80px auto;
+                border-spacing: 16px;
+                margin: 0px auto;
             }
             #connect4Board .hole {
                 border-radius: 100%;
-                width: 60px;
-                height: 60px;
+                width: 55px;
+                height: 55px;
                 background-color: pink;
                 cursor: pointer;
             }
         </style>
+        <table id="previewPieces"></table>
+        <script>
+            var previewPieces = document.querySelector("#previewPieces");
+            var tr = document.createElement("tr");
+            for (var i = 0; i < WIDTH; i++) {
+                var td = document.createElement("td");
+                td.classList.add("previewPiece");
+                tr.appendChild(td);
+            }
+            previewPieces.appendChild(tr);
+        </script>
         <table id="connect4Board"></table>
         <script>
-            const NULL_CHAR = "x";
             var arrOfCols = [];
-            for (var i = 0; i < 7; i++) {
+            for (var i = 0; i < WIDTH; i++) {
                 var column = [];
-                for (var j = 0; j < 6; j++) {
+                for (var j = 0; j < HEIGHT; j++) {
                     column.push(NULL_CHAR);
                 }
                 arrOfCols.push(column);
@@ -53,9 +79,9 @@
 
             //Make basic grid
             var connect4Board = document.querySelector("#connect4Board");
-            for (var i = 0; i < 6; i++) {
+            for (var i = 0; i < HEIGHT; i++) {
                 var tr = document.createElement("tr");
-                for (var j = 0; j < 7; j++) {
+                for (var j = 0; j < WIDTH; j++) {
                     var td = document.createElement("td");
                     td.classList.add("hole");
                     td.setAttribute("holeNumber", j);
@@ -70,7 +96,6 @@
                     var td = tr[i].querySelectorAll("td");
                     for (var j = 0; j < transposeArrOfCols[i].length; j++) {
                         if (transposeArrOfCols[i][j] != NULL_CHAR) {
-                            //console.log(transposeArrOfCols[i][j])
                             td[j].style.backgroundColor = transposeArrOfCols[i][j];
                         }
                     }
@@ -114,25 +139,16 @@
                     return true;
                 }
                 //Diagonal test
-                /*UM how tf*/
                 var allDiagonalArrays = [];
                 function getAllDiagonalArrays(matrixArray) {
                     //Let's use the horizontal table for our better use here
                     //first get all diagonals top left to bottom right (same as bottom right to top left)
-                    /*var diagonal = [];
-                    for (var i = 0; i < matrixArray.length; i++) {
-                        var j = 0;
-                        while (matrixArray[i][j]) {
-                            diagonal.push(matrixArray[i][j]);
-                        }
-                    }*/
                     for (var iterator = matrixArray.length; iterator > 0; iterator--) {
                         var i = 0;
                         i = iterator - 1;
                         var j = 0;
                         var diagonalArray = [];
                         while (matrixArray[i] && matrixArray[i][j]) {
-                            //console.log(`i: ${i} j: ${j}`);
                             diagonalArray.push(matrixArray[i][j]);
                             i++;
                             j++;
@@ -161,9 +177,9 @@
                         }
                         allDiagonalArrays.push(diagonalArray);
                     }
-                    for (var iIterator = matrixArray.length, jIterator = 0; iIterator > 0, jIterator < matrixArray[0].length; iIterator--, jIterator++) {
+                    for (var iterator = 0; iterator < matrixArray[0].length; iterator++) {
                         var i = matrixArray.length - 1;
-                        var j = jIterator;
+                        var j = iterator;
                         var diagonalArray = [];
                         while (matrixArray[i] && matrixArray[i][j]) {
                             diagonalArray.push(matrixArray[i][j]);
@@ -233,18 +249,27 @@
                 x | x | x | x | x | x | x 
             ]
             */
-            var currentTurn;
+            var currentTurn = "red";
             var turns = 0;
             var holes = document.querySelectorAll(".hole");
             holes.forEach((hole) => {
+                hole.addEventListener("mouseover", (event)=> {
+                    var previewPieces = document.querySelectorAll(".previewPiece");
+                    previewPieces.forEach((previewPiece) => {
+                        previewPiece.style.visibility = "hidden";
+                    });
+                    var index = parseInt(hole.getAttribute("holeNumber"));
+                    previewPieces[index].style.backgroundColor = (currentTurn === "red") ? "yellow" : "red";
+                    previewPieces[index].style.visibility = "visible";
+                });
                 hole.addEventListener("click", (event) => {
                     if (turns % 2 === 0) {
                         //Red go
-                        currentTurn = "red";
+                        currentTurn = "yellow";
                     }
                     else {
                         //Yellow go
-                        currentTurn = "yellow";
+                        currentTurn = "red";
                     }
                     
                     var columnIndex = parseInt(hole.getAttribute("holeNumber"));
@@ -265,7 +290,10 @@
                         column[copyOfColumn.length - 1] = currentTurn;
                         updateBoardGUI();
                         if(checkConnect4()) {
-                            alert("Done");
+                            alert("Done...going to restart");
+                            setTimeout(()=>{
+                                window.location.reload();
+                            }, 2000);
                         }
                         else {
                         turns++;
