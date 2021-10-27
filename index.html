@@ -150,25 +150,25 @@
                         }
                         allDiagonalArrays.push(diagonalArray);
                     }
-                    for (var iterator = 0; iterator < matrixArray[0].length; iterator++) {
-                        var i = 0;
-                        var j = iterator;
+                    for (var iterator = 0; iterator < matrixArray.length; iterator++) {
+                        var i = iterator;
+                        var j = 0;
                         var diagonalArray = [];
                         while (matrixArray[i] && matrixArray[i][j]) {
                             diagonalArray.push(matrixArray[i][j]);
-                            i++;
-                            j--;
+                            i--;
+                            j++;
                         }
                         allDiagonalArrays.push(diagonalArray);
                     }
-                    for (var iIterator = 0, jIterator = matrixArray[0].length - 1; iIterator < matrixArray.length, jIterator > 0; iIterator++, jIterator--) {
-                        var i = iIterator;
+                    for (var iIterator = matrixArray.length, jIterator = 0; iIterator > 0, jIterator < matrixArray[0].length; iIterator--, jIterator++) {
+                        var i = matrixArray.length - 1;
                         var j = jIterator;
                         var diagonalArray = [];
                         while (matrixArray[i] && matrixArray[i][j]) {
                             diagonalArray.push(matrixArray[i][j]);
-                            i++;
-                            j--;
+                            i--;
+                            j++;
                         }
                         allDiagonalArrays.push(diagonalArray);
                     }
@@ -195,7 +195,7 @@
                     */
                 }
                 getAllDiagonalArrays(transposeArrOfCols);
-                //console.log(allDiagonalArrays);
+                console.log(allDiagonalArrays);
                 if (trimAndCheck(allDiagonalArrays)) {
                         fourInARow = true;
                         return true;
