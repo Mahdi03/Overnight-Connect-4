@@ -43,13 +43,13 @@
         <script>
             const NULL_CHAR = "x";
             var arrOfCols = [];
-           for (var i = 0; i < 7; i++) {
-               var column = [];
-               for (var j = 0; j < 6; j++) {
-                   column.push(NULL_CHAR);
-               }
-               arrOfCols.push(column);
-           }
+            for (var i = 0; i < 7; i++) {
+                var column = [];
+                for (var j = 0; j < 6; j++) {
+                    column.push(NULL_CHAR);
+                }
+                arrOfCols.push(column);
+            }
 
             //Make basic grid
             var connect4Board = document.querySelector("#connect4Board");
@@ -70,7 +70,7 @@
                     var td = tr[i].querySelectorAll("td");
                     for (var j = 0; j < transposeArrOfCols[i].length; j++) {
                         if (transposeArrOfCols[i][j] != NULL_CHAR) {
-                            console.log(transposeArrOfCols[i][j])
+                            //console.log(transposeArrOfCols[i][j])
                             td[j].style.backgroundColor = transposeArrOfCols[i][j];
                         }
                     }
@@ -84,6 +84,7 @@
                     });
                 }
                 function trimAndCheck(array) {
+                    //console.log(array.length);
                     for (var i = 0; i < array.length; i++) {
                         var column = [...array[i]]; //Copy the values so we don't accidentally modify the OG
                         //While empty spaces, remove those from consideration (trimming only from the sides)
@@ -93,20 +94,15 @@
                         while (column[column.length - 1] === NULL_CHAR) {
                             column.pop(); //Remove all last elements if empty
                         }
-                        if (column.length == 4) {
-                            console.log(column);
-                        }
                         if (find4InARowArray(column)) {
                             return true; //Stop looping and return the function rn rn
-                        }
-                        else {
-                            return false;
                         }
                     }
                 }
                 var fourInARow = false;
                 //Vertical test
                 if (trimAndCheck(arrOfCols)) {
+                    fourInARow = true;
                     return true;
                 }
                 //Horizontal test
@@ -114,6 +110,7 @@
                 var transposeArrOfCols = transposeMatrixArray(arrOfCols);
                 console.table(transposeArrOfCols);
                 if (trimAndCheck(transposeArrOfCols)) {
+                    fourInARow = true;
                     return true;
                 }
                 //Diagonal test
@@ -198,16 +195,15 @@
                     */
                 }
                 getAllDiagonalArrays(transposeArrOfCols);
-                console.log(allDiagonalArrays);
+                //console.log(allDiagonalArrays);
                 if (trimAndCheck(allDiagonalArrays)) {
-                        console.log("hi");
+                        fourInARow = true;
                         return true;
                     }
                 /*
                 for (var t = 0; t < allDiagonalArrays.length; t++) {
                     console.log(trimAndCheck(allDiagonalArrays[t]));
                     if (trimAndCheck(allDiagonalArrays[t])) {
-                        console.log("hi");
                         fourInARow = true;
                         return true;
                     }
@@ -273,7 +269,7 @@
                         }
                         else {
                         turns++;
-                        //console.log("Next turn");
+                        console.log("Next turn");
                         //console.log(arrOfCols);
                         }
                     }
