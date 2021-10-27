@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        <style>
+            #connect4Board {
+                background-color: blue;
+                border-spacing: 20px;
+                margin: 80px auto;
+            }
+            #connect4Board .hole {
+                border-radius: 100%;
+                width: 60px;
+                height: 60px;
+                background-color: pink;
+                cursor: pointer;
+            }
+        </style>
+        <table id="connect4Board"></table>
+        <script>
+            //Make basic grid
+            var connect4Board = document.querySelector("#connect4Board");
+            for (var i = 0; i < 6; i++) {
+                var tr = document.createElement("tr");
+                for (var j = 0; j < 7; j++) {
+                    var td = document.createElement("td");
+                    td.classList.add("hole");
+                    td.setAttribute("holeNumber", j);
+                    tr.appendChild(td);
+                }
+                connect4Board.appendChild(tr);
+            }
+            //Make GUI
+            /*
+            Yellow vs. Red
+            Pink Background
+            Blue square
+            7 wide
+            6 tall
+            and don't forget to draw stands
+            on hover row, show turns and where the piece would be dropped
+            on click row, drop piece and change turn
+            */
+            //Make Backend
+            /**/
+        </script>
+    </body>
+</html>
